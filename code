@@ -15,77 +15,79 @@
 #                                        3
 
 
-
 import random
 
-# Функция которая генерирует матрицу
-def generate_matrix(n):
-    return [[random.randint(-10, 10) for _ in range(n)] for _ in range(n)]
+# Генерация матрицы A и ее подматриц (B, C, D, E)
+def generate_matrix(N):
+    A = [[0] * N for _ in range(N)]
 
-# Функция которая транспонирует матрицу
-def transpose_matrix(matrix):
-    return [[matrix[j][i] for j in range(len(matrix))] for i in range(len(matrix[0]))]
+    # Генерация значений для подматриц B, C, D, E
+    for i in range(N):
+        for j in range(N):
+            # Подматрица B
+            if i >= N // 2 and j < N // 2:
+                A[i][j] = random.randint(-10, 10)
+            # Подматрица C
+            elif i >= N // 2 and j >= N // 2:
+                A[i][j] = random.randint(-10, 10)
+            # Подматрица D
+            elif i < N // 2 and j >= N // 2:
+                A[i][j] = random.randint(-10, 10)
+            # Подматрица E
+            else:
+                A[i][j] = random.randint(-10, 10)
 
-# Функция, которая меняет местами области 1 и 3 матрицы C
-def swap(C):
-    for i in range(len(C) // 2):
-        for j in range(len(C[i]) // 2):
-            C[i][j], C[i][j + len(C) // 2] = C[i][j + len(C) // 2], C[i][j]
-            C[i + len(C) // 2][j], C[i + len(C) // 2][j + len(C) // 2] = C[i + len(C) // 2][j + len(C) // 2], \
-            C[i + len(C) // 2][j]
+    return A
+
+# Формирование матрицы F в соответствии с условиями (если в С количество положительных элементов в четных столбцах в области 2 больше, чем количество отрицательных  элементов в нечетных столбцах в области 4)
+def form_matrix_F(C, E):
+    pos_count_area2 = sum(C[i][j] > 0 for i in range(len(C)) for j in range(len(C[i])) if j % 2 == 0)  # Вычисление количества положительных элементов в четных столбцах области 2 матрицы C
+    neg_count_area4 = sum(C[i][j] < 0 for i in range(len(C)) for j in range(len(C[i])) if j % 2 != 0)  # Вычисление колтчества отрицательных элементов в нечетных столбцах области 4 матрицы C
+
+    if pos_count_area2 > neg_count_area4:
+        # Поменять в C симметрично области 1 и 3
+        n = len(C)
+        for i in range(n // 2):
+            C[i], C[n - i - 1] = C[n - i - 1], C[i]
+    else:
+        # Поменять C и E местами несимметрично
+        C, E = E, C
+
     return C
 
+# Вычисление выражения (F+A)*AT - K * F
+def calculate_F(F, A, AT, K):
+    result_matrix = [[(F[i][j] + A[i][j]) * AT[i][j] - K * F[i][j] for j in range(len(F))] for i in range(len(F))]
+    return result_matrix
+
 def main():
-    K = int(input("Введите K: "))
-    N = int(input("Введите N: "))
+    K = int(input("Введите число K: "))
+    N = int(input("Введите размер матрицы N (должно быть четным и больше 6): ")) # N должен быть четным и больше 6, тк А состоит из 4 равных подматриц. Больше 6 тк подматрицы имеют минимум 2 строки и 2 столбца
 
-    # Генерация матриц
-
+    # Генерация матрицы A(N,N) и ее подматриц B, C, D, E
     A = generate_matrix(N)
-    B = [[1, 4], [2, 3]]
-    C = [[1, 4], [2, 3]]
-    D = [[1, 4], [2, 3]]
-    E = [[1, 4], [2, 3]]
-
-    # Вывод начальных матриц
-
-    print("Матрица A:")
+    print("\nМатрица A:")
     for row in A:
         print(row)
-    print("Матрица B:")
-    for row in B:
-        print(row)
-    print("Матрица C:")
-    for row in C:
-        print(row)
-    print("Матрица D:")
-    for row in D:
-        print(row)
-    print("Матрица E:")
-    for row in E:
-        print(row)
 
-    #Формируем матрицу F
+    # Создание матриц B, C, D, E
+    B = [row[1::2] for row in A]
+    C = [row[:N // 2] + row[N // 2:] for row in A]
+    D = [row[N // 2:] for row in A]
+    E = [row[:N // 2] for row in A]
 
-    F = C
-
-    # Проверка: если кол-во положительных элементов в четных столбцах области 2 > кол-ва отрицательных элементов в нечетных столбцах области 4 то меняем местами области 1 и 3 в матрице C
-
-    if sum(C[i][j] > 0 for i in range(len(C)) for j in range(len(C[i]) // 2) if j % 2 == 0) > sum(
-        C[i][j] < 0 for i in range(len(C)) for j in range(len(C[i]) // 2) if j % 2 != 0):
-        F = swap(C)
-
-    # Вычисление выражения (F+A)*AT – K * F
-
-    AT = transpose_matrix(F)
-    result_matrix = [[(F[i][j] + A[i][j]) * AT[i][j] - K * F[i][j] for j in range(len(F))] for i in range(len(F))]
-
-    # Вывод результатов
-
-    print("Матрица F:")
+    # Формирование матрицы F
+    F = form_matrix_F(C, E)
+    print("\nМатрица F:")
     for row in F:
         print(row)
-    print("Результат выражения (F+A)*F – K * F:")
+
+    # Вычисление выражения (F+A)*AT - K * F
+    AT = [[row[i] for row in F] for i in range(len(F))]
+    result_matrix = calculate_F(F, A, AT, K)
+
+    # Вывод результатов
+    print("\nРезультат выражения (F+A)*F – K * F:")
     for row in result_matrix:
         print(row)
 main()
