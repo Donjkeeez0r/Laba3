@@ -39,12 +39,12 @@ def generate_matrix(N):
 
     return A
 
-# Формирование матрицы F в соответствии с условиями (если в С количество положительных элементов в четных столбцах в области 2 больше, чем количество отрицательных  элементов в нечетных столбцах в области 4)
+# Формирование матрицы F
 def form_matrix_F(C, E):
-    pos_count_area2 = sum(C[i][j] > 0 for i in range(len(C)) for j in range(len(C[i])) if j % 2 == 0)  # Вычисление количества положительных элементов в четных столбцах области 2 матрицы C
-    neg_count_area4 = sum(C[i][j] < 0 for i in range(len(C)) for j in range(len(C[i])) if j % 2 != 0)  # Вычисление колтчества отрицательных элементов в нечетных столбцах области 4 матрицы C
+    pos_el_area_2 = sum(C[i][j] > 0 for i in range(len(C) // 2, len(C)) for j in range(len(C) // 2))
+    neg_el_area_4 = sum(C[i][j] < 0 for i in range(len(C) // 2) for j in range(len(C) // 2, len(C)))
 
-    if pos_count_area2 > neg_count_area4:
+    if pos_el_area_2 > neg_el_area_4:
         # Поменять в C симметрично области 1 и 3
         n = len(C)
         for i in range(n // 2):
@@ -62,7 +62,7 @@ def calculate_F(F, A, AT, K):
 
 def main():
     K = int(input("Введите число K: "))
-    N = int(input("Введите размер матрицы N (должно быть четным и больше 6): ")) # N должен быть четным и больше 6, тк А состоит из 4 равных подматриц. Больше 6 тк подматрицы имеют минимум 2 строки и 2 столбца
+    N = int(input("Введите размер матрицы N (должно быть четным и больше 6): "))
 
     # Генерация матрицы A(N,N) и ее подматриц B, C, D, E
     A = generate_matrix(N)
@@ -71,10 +71,10 @@ def main():
         print(row)
 
     # Создание матриц B, C, D, E
-    B = [row[1::2] for row in A]
-    C = [row[:N // 2] + row[N // 2:] for row in A]
-    D = [row[N // 2:] for row in A]
-    E = [row[:N // 2] for row in A]
+    B = [row[0:N//2] for row in A[0:N//2]]
+    C = [row[N//2:] for row in A[0:N//2]]
+    D = [row[0:N//2] for row in A[N//2:]]
+    E = [row[N//2:] for row in A[N//2:]]
 
     # Формирование матрицы F
     F = form_matrix_F(C, E)
