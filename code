@@ -21,17 +21,17 @@ import random
 def generate_matrix(N):
     A = [[0] * N for _ in range(N)]
 
-    # Генерация значений для подматриц B, C, D, E
+    # Генерация подматриц B, C, D, E
     for i in range(N):
         for j in range(N):
             # Подматрица B
-            if i >= N // 2 and j < N // 2:
+            if i < N // 2 and j < N // 2:
                 A[i][j] = random.randint(-10, 10)
             # Подматрица C
-            elif i >= N // 2 and j >= N // 2:
+            elif i < N // 2 and j >= N // 2:
                 A[i][j] = random.randint(-10, 10)
             # Подматрица D
-            elif i < N // 2 and j >= N // 2:
+            elif i >= N // 2 and j < N // 2:
                 A[i][j] = random.randint(-10, 10)
             # Подматрица E
             else:
@@ -41,17 +41,35 @@ def generate_matrix(N):
 
 # Формирование матрицы F
 def form_matrix_F(C, E):
-    pos_el_area_2 = sum(C[i][j] > 0 for i in range(len(C) // 2, len(C)) for j in range(len(C) // 2))
-    neg_el_area_4 = sum(C[i][j] < 0 for i in range(len(C) // 2) for j in range(len(C) // 2, len(C)))
+    # Сумма элементов в областях
+    sum_area2 = 0
+    sum_area4 = 0
+    sum_area1 = 0
+    sum_area3 = 0
+    n = len(C)
 
-    if pos_el_area_2 > neg_el_area_4:
-        # Поменять в C симметрично области 1 и 3
-        n = len(C)
+    # Вычисление сумм элементов в областях
+    for i in range(n):
+        for j in range(n):
+            # Область 2
+            if i >= n // 2 and j < n // 2:
+                sum_area2 += C[i][j]
+            # Область 4
+            elif i < n // 2 and j >= n // 2:
+                sum_area4 += C[i][j]
+            # Область 1
+            if i < n // 2 and j < i:
+                sum_area1 += C[i][j]
+            # Область 3
+            if i >= n // 2 and j < n - i - 1:
+                sum_area3 += C[i][j]
+
+    # Условие
+    if sum_area2 > sum_area4:
         for i in range(n // 2):
-            C[i], C[n - i - 1] = C[n - i - 1], C[i]
+            C[i][:i], C[n - i - 1][:n - i - 1] = C[n - i - 1][:n - i - 1], C[i][:i] # Поменять в C симметрично области 1 и 3
     else:
-        # Поменять C и E местами несимметрично
-        C, E = E, C
+        C, E = E, C # Поменять C и E местами несимметрично
 
     return C
 
@@ -62,7 +80,7 @@ def calculate_F(F, A, AT, K):
 
 def main():
     K = int(input("Введите число K: "))
-    N = int(input("Введите размер матрицы N (должно быть четным и больше 6): "))
+    N = int(input("Введите размер матрицы N: "))
 
     # Генерация матрицы A(N,N) и ее подматриц B, C, D, E
     A = generate_matrix(N)
