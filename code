@@ -57,12 +57,6 @@ def form_matrix_F(C, E):
             # Область 4
             elif i < n // 2 and j >= n // 2:
                 sum_area4 += C[i][j]
-            # Область 1
-            if i < n // 2 and j < i:
-                sum_area1 += C[i][j]
-            # Область 3
-            if i >= n // 2 and j < n - i - 1:
-                sum_area3 += C[i][j]
 
     # Условие
     if sum_area2 > sum_area4:
