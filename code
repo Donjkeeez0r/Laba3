@@ -41,14 +41,11 @@ def generate_matrix(N):
 
 # Формирование матрицы F
 def form_matrix_F(C, E):
-    # Сумма элементов в областях
+    n = len(C)
     sum_area2 = 0
     sum_area4 = 0
-    sum_area1 = 0
-    sum_area3 = 0
-    n = len(C)
 
-    # Вычисление сумм элементов в областях
+    # Вычисление сумм элементов в областях 2 и 4
     for i in range(n):
         for j in range(n):
             # Область 2
@@ -58,12 +55,11 @@ def form_matrix_F(C, E):
             elif i < n // 2 and j >= n // 2:
                 sum_area4 += C[i][j]
 
-    # Условие
     if sum_area2 > sum_area4:
         for i in range(n // 2):
-            C[i][:i], C[n - i - 1][:n - i - 1] = C[n - i - 1][:n - i - 1], C[i][:i] # Поменять в C симметрично области 1 и 3
+            C[i][:i], C[n - i - 1][:n - i - 1] = C[n - i - 1][:n - i - 1], C[i][:i]  # Поменять в C симметрично области 1 и 3
     else:
-        C, E = E, C # Поменять C и E местами несимметрично
+        C, E = E, C  # Поменять C и E местами несимметрично
 
     return C
 
@@ -102,4 +98,6 @@ def main():
     print("\nРезультат выражения (F+A)*F – K * F:")
     for row in result_matrix:
         print(row)
+
 main()
+
